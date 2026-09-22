@@ -1,21 +1,26 @@
-VERSION = "1.1.0-dev"
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+VERSION = "1.0.1"
 
 
-def payment():
-    return "Payment sucessfull"
+class Handler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        if self.path == "/health":
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"OK")
+        else:
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(
+                f"Retail App - Version {VERSION}".encode()
+            )
 
 
-def product():
-    return "Product available"
+server = HTTPServer(("0.0.0.0", 8081), Handler)
 
-def search():
-    return "Search available"
+print(f"Retail App - Version {VERSION}")
+print("Running on port 8081")
 
-def cart():
-    return "Cart available"
-
-
-if __name__ == "__main__":
-    print(f"Retail App - Version {VERSION}")
-    print(payment())
-    print(product())
+server.serve_forever()
