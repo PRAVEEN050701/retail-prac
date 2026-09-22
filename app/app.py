@@ -2,7 +2,7 @@ VERSION = "1.0.0"
 
 
 def payment():
-    return "Payment successful"
+    return "Payment sucessfull"
 
 
 def product():
