@@ -11,6 +11,9 @@ def product():
 def search():
     return "Search available"
 
+def cart():
+    return "Cart available"
+
 
 if __name__ == "__main__":
     print(f"Retail App - Version {VERSION}")
