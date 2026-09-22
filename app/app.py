@@ -8,6 +8,9 @@ def payment():
 def product():
     return "Product available"
 
+def search():
+    return "Search available"
+
 
 if __name__ == "__main__":
     print(f"Retail App - Version {VERSION}")
