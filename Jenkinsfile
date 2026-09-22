@@ -44,7 +44,7 @@ pipeline {
                         error('VERSION is required')
                     }
 
-                    def tagStatus = sh(
+                    def tagStatus = bat(
                         script: "git rev-parse --verify refs/tags/v${params.VERSION}",
                         returnStatus: true
                     )
@@ -65,7 +65,7 @@ pipeline {
         stage('Identify Commit') {
             steps {
                 script {
-                    def commit = sh(
+                    def commit = bat(
                         script: "git rev-list -n 1 v${params.VERSION}",
                         returnStdout: true
                     ).trim()
@@ -77,7 +77,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t retail-app:${params.VERSION} ."
+                bat  "docker build -t retail-app:${params.VERSION} ."
                 echo "Built image: retail-app:${params.VERSION}"
             }
         }
@@ -85,7 +85,7 @@ pipeline {
         stage('Record Previous Image') {
             steps {
                 script {
-                    env.OLD_IMAGE = sh(
+                    env.OLD_IMAGE = bat(
                         script: "docker ps --filter name=retail-app --format '{{.Image}}'",
                         returnStdout: true
                     ).trim()
@@ -97,7 +97,7 @@ pipeline {
 
         stage('Start New Version') {
             steps {
-                sh "docker run -d --name retail-app-new -p 8081:8081 retail-app:${params.VERSION}"
+                bat  "docker run -d --name retail-app-new -p 8081:8081 retail-app:${params.VERSION}"
                 echo "Started new version: retail-app:${params.VERSION}"
             }
         }
@@ -107,7 +107,7 @@ pipeline {
                 script {
                     sleep 5
 
-                    def status = sh(
+                    def status = bat(
                         script: "docker inspect -f '{{.State.Health.Status}}' retail-app-new",
                         returnStdout: true
                     ).trim()
@@ -124,10 +124,10 @@ pipeline {
         stage('Complete Deployment') {
             steps {
                 script {
-                    sh "docker stop retail-app || true"
-                    sh "docker rm retail-app || true"
+                    bat "docker stop retail-app || true"
+                    bat "docker rm retail-app || true"
 
-                    sh "docker rename retail-app-new retail-app"
+                    bat"docker rename retail-app-new retail-app"
 
                     echo "Old version: ${env.OLD_IMAGE}"
                     echo "New version: retail-app:${params.VERSION}"
@@ -142,11 +142,11 @@ pipeline {
             script {
                 echo "Deployment failed. Starting automatic rollback..."
 
-                sh "docker stop retail-app-new || true"
-                sh "docker rm retail-app-new || true"
+                bat "docker stop retail-app-new || true"
+                bat "docker rm retail-app-new || true"
 
                 if (env.OLD_IMAGE?.trim()) {
-                    sh "docker run -d --name retail-app -p 8081:8081 ${env.OLD_IMAGE}"
+                    bat"docker run -d --name retail-app -p 8081:8081 ${env.OLD_IMAGE}"
                     echo "Restored old version: ${env.OLD_IMAGE}"
                 }
 
