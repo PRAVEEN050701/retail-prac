@@ -34,12 +34,6 @@ pipeline {
 
     stages {
 
-        stage('Check Git') {
-            steps {
-                bat 'where git'
-                bat 'git --version'
-            }
-        }
 
         stage('Fetch Tags') {
             steps {
